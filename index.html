@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Lessons Learned From a Large-Scale MongoDB Cluster in the Cloud</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Mike Bjerkness">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/default.css" id="theme">
+		<link rel="stylesheet" href="assets/style.css">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section title="Title Slide">
+					<h2>Lessons Learned From a Large-Scale MongoDB Cluster in the Cloud	</h2>
+				</section>
+
+        <!-- Section on my background and who I am -->
+				<section>
+
+					<section title="Who am I">
+						<h2>Who am I?</h2>
+					</section>
+
+					<section title="Bjerkness Slide">
+						<h2>Mike Bjerkness</h2>
+						<h5>Director of Development</h5>
+						<div><small>mbjerkness@spscommerce.com</small></div>
+						<small><a href="http://twitter.com/mikebjerkness">@mikebjerkness</a></small>
+					</section>
+
+          <section title="Background">
+            <h2>Background</h2>
+            <ul>
+              <li class="fragment">Director of Engineering at 8thBridge</li>
+              <ul>
+                <li class="fragment">Responsible for Software Development</li>
+                <li class="fragment">Resposnible for Operations</li>
+                <li class="fragment">Resposnible for Quality Assurance</li>
+              </ul>
+              <li class="fragment">Software Engineer at EA Tiburon</li>
+              <li class="fragment">Modeling and Simulation Engineer at BAE Systems</li>
+            </ul>
+          </section>
+				</section>
+
+				<!-- Platform Oviewview -->
+				<section title="8thBridge Overview">
+          <h2>8thBridge Overview</h2>
+					<ul>
+            <li class="fragment">Social Commerce SAAS startup in Minneapolis</li>
+            <li class="fragment">Social discovery plugins to create an on-site social experience</li>
+            <li class="fragment">Analytics workbench to provide product and user insights</li>
+            <li class="fragment">Technology used included nginx, python, MongoDB, Celery Queue all running on AWS</li>
+            <li class="fragment">Amazon EMR for hosted hadoop mapreduce functionality</li>
+          </ul>
+				</section>
+
+				<!-- Object data gathering -->
+				<section>
+					<section title="Gathering Unstructured Object Data">
+						<h2>Gathering Unstructured Data</h2>
+						<h4>object data</h4>
+						<ul>
+							<li class="fragment">The 8thBridge JavaScript host script and plugins are added to a client website</li>
+							<li class="fragment">The first load of the webpage will kick off hydration</li>
+							<li class="fragment">Hydration scrapes the page for data including image, title, description, price, and any other custom data items</li>
+							<li class="fragment">Hydration stores object data in MongoDB with a core set of properties including URL, image, creation date, updated date, version, and a few others. All other object data is stored in an attribute array on the object</li>
+						</ul>
+					</section>
+
+					<section title="meta tags">
+						<h2>Meta Tags</h2>
+					<pre><code data-trim>
+<html>
+<head>
+<meta property="og:image" content="http://www.bjerkness.com/assets/images/ninja.jpg">
+<meta property="og:type" content="product">
+<meta property="og:title" content="Ninja T shirt">
+<meta property="og:url" content="http://www.bjerkness.com/ninja_shirt.html">
+
+<meta property="eb:id" content="7744" />
+<meta property="eb:tags" content="shirt,bjerkness,ninja,css,awesome" />
+<meta property="eb:price" content="$38.00" />
+<meta property="eb:pricerange" content="$38.00 - $43.00" />
+<meta property="eb:saleprice" content="$30.00" />
+<meta property="eb:currency" content="USD" />
+</head>
+</html>
+					</code></pre>
+					</section>
+				</section>
+
+				<!-- Tracking data gathering -->
+				<section>
+					<section title="Gathering Tracking Data">
+						<h2>Gathering Unstructured Data</h2>
+						<h4>tracking data</h4>
+						<ul>
+							<li class="fragment">The 8thBridge platform tracks data a variety of ways</li>
+							<li class="fragment">Plugin tracking, similar to Google Analytics, Omniture, etc</li>
+							<li class="fragment">Clickthrough tracking in API</li>
+							<li class="fragment">Behavior tracking in every plugin</li>
+							<li class="fragment">Adding 10 million tracking records per day</li>
+						</ul>
+					</section>
+
+					<section title="Plugin View Tracking Document">
+						<h2>Example Tracking Document</h2>
+					<pre><code data-trim>
+{
+	"_id" : "B6NSyhauLpHJT+cQ6z8",
+	"faid" : "118407138370644",
+	"t" : "pageview",
+	"sid" : BinData(3,"kU4g/nWIEeO6YCIACusVrg=="),
+	"uid" : "5288131a9017456089fe6ed8",
+	"ip" : "66.229.244.254",
+	"ua" : ObjectId("51f72357399113c62ea2c467"),
+	"ts" : ISODate("2014-01-06T02:36:30.404Z"),
+	"attrs" : {
+		"real" : true,
+		"pid" : "5252df973703971e932e3e47",
+		"id" : ObjectId("525fcbcdfa489e0f011bc135"),
+	}
+}
+					</code></pre>
+					</section>
+				</section>
+
+				<!-- Social data gathering -->
+				<section>
+					<section title="Gathering Social Data">
+						<h2>Gathering Unstructured Data</h2>
+						<h4>social data</h4>
+						<ul>
+							<li class="fragment">When a user interacts with an 8thBridge social plugin, Facebook authorization is offered</li>
+							<li class="fragment">After successful authorization, the API will send asynchronous tasks to Celery to gather the user’s Facebook Profile information</li>
+							<li class="fragment">The resulting data is stored in both MongoDB</li>
+						</ul>
+					</section>
+
+
+				<!-- Multi-tenancy -->
+				<section title="Mutli-tenant data">
+					<h2>Multi-tenant data</h2>
+					<ul>
+						<li class="fragment">Data for all clients stored in same collections</li>
+						<li class="fragment">Client-specific identifiers allow us to split the data</li>
+						<li class="fragment">We can bring on new clients very quickly since all databases and collections are created already</li>
+						<li class="fragment">Adding new tracking elements is straightforward</li>
+					</ul>
+				</section>
+
+
+				<!-- Mongo -->
+				<section title="Why MongoDB?">
+					<h2>Why MongoDB?</h2>
+					<ul>
+						<li class="fragment">Scalable, high-performance, open-source NoSQL database</li>
+						<li class="fragment">Allows dynamic schemas</li>
+						<li class="fragment">Powerful query language</li>
+            <li class="fragment">Easy to add fields to documents in collections</li>
+            <li class="fragment">Easy learning curve for development team</li>
+
+					</ul>
+				</section>
+
+        <section title="Initial Architecture">
+          <h2>Initial Architecture</h2>
+          <ul>
+            <li class="fragment">12 node cluster, 4 Shards each as a 3 member replica set</li>
+            <li class="fragment">2 Regions US-EAST and US-WEST</li>
+            <li class="fragment">Master and 1 slave in US-EAST, 1 slave in US-WEST</li>
+            <li class="fragment">RAID 0 using EBS</li>
+            <li class="fragment">Total data size: 150 GB</li>
+            <li class="fragment">Index size: 40 GB</li>
+            <li class="fragment">Largest collection: 60 GB</li>
+            <li class="fragment">Largest index: 10 GB</li>
+          </ul>
+        </section>
+
+        <section title="Issues with initial Deployment">
+          <h2>Issues with orignal architecture</h2>
+          <ul>
+            <li class="fragment">Even though we had a slave in US-WEST we were really just 1 region</li>
+            <li class="fragment">Shard key choices for some collections caused hotspotting</li>
+            <li class="fragment">Not all collections were sharded, which caused hotspotting on the 1st shard</li>
+            <li class="fragment">EBS was too inconsistent and unreliable to be used for a high performance database</li>
+            <li class="fragment">Not enough memory to keep working set in RAM</li>
+            <li class="fragment">AWS did not have SSD instances at the time and cost was prohibitive for high memory instances</li>
+          </ul>
+        </section>
+
+        <section title="Workarounds">
+          <h2>Work arounds</h2>
+          <ul>
+            <li class="fragment">Scheduling the balancer to rebalance across shards</li>
+            <li class="fragment">Wrote a tracking drainer to move tracking documents into S3</li>
+            <li class="fragment">Implemented Hadoop using EMR for reporting and moved away from ETL processes in python</li>
+            <li class="fragment">A lot of query optimizations</li>
+            <li class="fragment">Limited indexes on collections due to memory limitations</li>
+            <li class="fragment">Removed count operations in code</li>
+          </ul>
+        </section>
+
+        <section title="Epiphany">
+          <h2>Major change</h2>
+          <ul>
+            <li class="fragment">Operations engineer went to Velocity conference and talked to Etsy peeps</li>
+            <li class="fragment">Move away from 4 shards to a single sharded architecture</li>
+            <li class="fragment">New AWS hi1.4xlarge instance with 60GB RAM and 2x 1 TB SSDs for master and 1 slave</li>
+            <li class="fragment">New AWS cc2.8xlarge instance with 60GB RAM and 4x 840 GB drives for the other slave</li>
+            <li class="fragment">Saved money, simplified architecture, added extra headroom</li>
+            <li class="fragment">Kept collections sharded in case we needed to add a shard in the future</li>
+            <li class="fragment">Upgrade to mongodb 2.4</li>
+          </ul>
+        </section>
+
+        <section title="Rejoice">
+          <h2>Rejoice!</h2>
+          <ul>
+            <li class="fragment">20x increase in traffic during the 2013 holiday season</li>
+            <li class="fragment">Went from an average of 5000 API requests per minute to a peak of over 100,000</li>
+            <li class="fragment">Added a ton of caching with Amazon ElastiCache</li>
+            <li class="fragment">Optimized queries in application layer on heavily read paths</li>
+            <li class="fragment">Reduced index size on collections</li>
+            <li class="fragment">Used pre-calculated collections of data for recent activity, trending products and trending collections to alleviate stress on production MongoDB instances</li>
+          </ul>
+        </section>
+
+        <section title="Uh oh">
+          <h2>Uh Oh!</h2>
+		      <img width="900" height="600" src="images/holiday.jpeg" alt="graph">
+        </section>
+
+        <section title="What Happened?">
+          <h2>What Happened?</h2>
+          <ul>
+            <li class="fragment">MongoDB has a database level write lock, this was known, however...</li>
+            <li class="fragment">“a single write operation holds the lock exclusively, and no other read or write operations may share the lock.”</li>
+            <li class="fragment">Writes to the tracking collection caused the entire database to lock</li>
+            <li class="fragment">We had so much sustained traffic that the writes were queuing and the lock % kept increasing</li>
+            <li class="fragment">Our monitoring did not alert us soon enough to remediate the problem before the platform had major performance degradation</li>
+          </ul>
+        </section>
+
+
+        <section title="Remediation">
+          <h2>Remediation</h2>
+          <ul>
+            <li class="fragment">Moved the tracking collection into it’s own database on the same server</li>
+            <li class="fragment">Updated code on all of our API servers to indicate the new location of the tracking collection</li>
+            <li class="fragment">Tested the new database configuration on a single API server added to the production load balancer</li>
+            <li class="fragment">Rolled out the hotfix to the 20 other API servers, one by one</li>
+            <li class="fragment">Within 30 minutes we had fixed the issue and saw performance returning to acceptable levels</li>
+          </ul>
+        </section>
+
+      <section title="Fallout">
+        <h2>Fallout</h2>
+        <ul>
+          <li class="fragment">Tracking collection was moved to a new database, all of our reporting was off for days</li>
+          <li class="fragment">All other systems needed to be updated to use the new tracking collection</li>
+          <li class="fragment">Monitoring and logging infrastructure was analyzed</li>
+          <li class="fragment">Platform had performance degradation, but never went down</li>
+          <li class="fragment">Platform behaved accordingly, never affected the client website load times, only our content</li>
+        </ul>
+      </section>
+
+				<section title="Lessons Learned">
+					<h2>Lessons Learned</h2>
+					<ul>
+						<li class="fragment">Working set needs to fit in memory</li>
+						<ul><li class="fragment">need as much RAM as your indexes</li></ul>
+					<li class="fragment">SSDs far preferable to EBS</li>
+						<ul><li class="fragment">even with provisioned IOPS</li></ul>
+					<li class="fragment">Fragmentation wastes memory</li>
+						<ul><li class="fragment">prevent with padding</li>
+						<li class="fragment">fix with compaction</li></ul>
+					<li class="fragment">Locking</li>
+						<ul><li class="fragment">improved in 2.4</li>
+						<li class="fragment">still a database-wide read-write lock</li></ul>
+					</ul>
+
+				</section>
+				<section title="Sharding">
+					<h2>Sharding</h2>
+					<ul>
+						<li class="fragment">pro: increases parallelization</li>
+						<li class="fragment">con: increases complexity and cost, possible hotspotting</li>
+						<li class="fragment">worthwhile if you can’t config your way out of locking problems</li>
+						<li class="fragment">mongos connection pool doesn’t handle primary changes well</li>
+					</ul>
+				</section>
+
+				<section title="Questions">
+					<h1>Questions</h1>
+          <img width="630" height="420" src="images/questions.jpg" alt="graph">
+          <small>http://coverlaydown.com/wp-content/uploads/2014/02/0318_sb_readerQuestions_630x420.jpg</small>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: 'fade', // Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+		<script>
+			Reveal.addEventListener( 'slidechanged', function( event ) {
+				var title = event.currentSlide.title;
+				if (!title || (title && title.length == 0)) {
+					title = "slide";
+				}
+				var slidestr = title + " (" + event.indexh + "." + event.indexv + ")";
+				ga('send', 'pageview', slidestr);
+
+				console.log(slidestr);
+			});
+
+		</script>
+
+		<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		  ga('create', 'UA-20880824-15', 'strcst.net');
+		  ga('send', 'pageview');
+
+		</script>
+
+	</body>
+</html>

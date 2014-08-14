@@ -1,0 +1,79 @@
+small key names
+ts vs timestamp
+use _id for timestamp when you can
+ObjectId is a terrible shard key since it is timebased
+
+creating indexes is tough on a large dataset
+  background add on primary is a foreground add on the secondaries - locks db - kills reads on secondaries SLAVE_OK
+  fixed in mongo 2.2?
+
+Dump data into hadoop to do map-reduce - s3 - etc
+
+2.2 introduced database level locking instead of global locks
+  Still an issue with collection level locking
+  Tracking DB as an example
+
+Outline
+
+What is MongoDB?
+- Key pros
+- Some cons
+
+Started with MongoDB 2.0
+- Issues
+
+Upgrade to MongoDB 2.2
+- Features
+
+Upgrade to MongoDB 2.4
+-Features
+
+Original Architecture
+- 4 Shards
+-- 3 member replica sets
+-- Shard key choices
+--- By client - not great since some clients will have a lot more data and cause hotspotting
+--- Random - even data spread, but finding data could become difficult since it's random
+---
+-- Hotspots
+-- Not all collections sharded
+--
+
+Key Issues
+- Not all indexes in memory
+- EBS volumnes = slow
+- No choice for SSD instances
+- High cost for top performance instances on AWS
+
+Work arounds
+- Tracking drainer
+- Move ETL and reporting to Hadoop on EMR
+- Optimize queries
+- Remove "count" operations
+- Limit indexes
+
+Epiphany
+- Operations engineer went to Velocity conference and talked to Etsy peeps
+- Move away from shards to a single instance with lotso RAM
+- SSD backed instances hi1.4xlarge (1 master, 1 secondary) cc2.8xlarge (1 secondary)
+- Actually saved money and simplified architecture
+- Kept collections sharded in case we needed to add a shard in the future (did not need to)
+
+Rejoice!
+- 20x increase in traffic over holidays of 2013
+- Added a ton of caching with memcached
+- Optimized queries
+- Reduced indexes
+
+Failure :(
+- Database level locking bit us in the butt
+- Had a contingency plan
+- Moved tracking collection to it's own databse
+- Did this live
+- Immediately saw improvement
+- Never went down, but performance was degraded
+
+Post mortem
+- Tracking data shouldn't really live in MongoDB
+- We were right to use it as a trasactional store, but needed more
+- As traffic levels increase more, may need to move to redis, couchbase, riak, etc
