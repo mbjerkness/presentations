@@ -14,16 +14,16 @@
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
-		<link rel="stylesheet" href="reveal.js/css/theme/default.css" id="theme">
+		<link rel="stylesheet" href="/reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="/reveal.js/css/theme/default.css" id="theme">
 		<link rel="stylesheet" href="assets/style.css">
 
 		<!-- For syntax highlighting -->
-		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+		<link rel="stylesheet" href="/reveal.js/lib/css/zenburn.css">
 
 		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
 		<script>
-			document.write( '<link rel="stylesheet" href="reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+			document.write( '<link rel="stylesheet" href="/reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
 		</script>
 
 		<!--[if lt IE 9]>
@@ -246,7 +246,7 @@
           <h2>Rejoice!</h2>
           <ul>
             <li class="fragment">20x increase in traffic during the 2013 holiday season</li>
-            <li class="fragment">Went from an average of 5000 API requests per minute to a peak of over 100,000</li>
+            <li class="fragment">Went from an average of 5,000 API requests per minute to an average ranging from 75,000 - 100,000 RPM peaking at 150,000 RPM</li>
             <li class="fragment">Added a ton of caching with Amazon ElastiCache</li>
             <li class="fragment">Optimized queries in application layer on heavily read paths</li>
             <li class="fragment">Reduced index size on collections</li>
@@ -297,7 +297,11 @@
 					<h2>Lessons Learned</h2>
 					<ul>
 						<li class="fragment">Working set needs to fit in memory</li>
-						<ul><li class="fragment">need as much RAM as your indexes</li></ul>
+						<ul>
+              <li class="fragment">need at least as much RAM as your indexes</li>
+              <li class="fragment">best case scenario is 2X RAM as your indexes</li>
+              <li class="fragment">this includes frequently read data and indexes</li>
+            </ul>
 					<li class="fragment">SSDs far preferable to EBS</li>
 						<ul><li class="fragment">even with provisioned IOPS</li></ul>
 					<li class="fragment">Fragmentation wastes memory</li>
@@ -329,8 +333,8 @@
 
 		</div>
 
-		<script src="reveal.js/lib/js/head.min.js"></script>
-		<script src="reveal.js/js/reveal.min.js"></script>
+		<script src="/reveal.js/lib/js/head.min.js"></script>
+		<script src="/reveal.js/js/reveal.min.js"></script>
 
 		<script>
 
@@ -351,12 +355,12 @@
 
 				// Optional libraries used to extend on reveal.js
 				dependencies: [
-					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
-					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
-					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					{ src: '/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: '/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: '/reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: '/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
 				]
 			});
 
