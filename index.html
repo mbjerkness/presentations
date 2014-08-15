@@ -47,6 +47,8 @@
 					<h5>Director of Development</h5>
 					<div><small>mbjerkness@spscommerce.com</small></div>
 					<small><a href="http://twitter.com/mikebjerkness">@mikebjerkness</a></small>
+					<img width="300" height="300" src="images/bjerkness.jpeg" alt="graph">
+
 				</section>
 
         <section title="Background">
@@ -55,8 +57,8 @@
             <li class="fragment">Director of Engineering at 8thBridge</li>
             <ul>
               <li class="fragment">Responsible for Software Development</li>
-              <li class="fragment">Resposnible for Operations</li>
-              <li class="fragment">Resposnible for Quality Assurance</li>
+              <li class="fragment">Responsible for Operations</li>
+              <li class="fragment">Responsible for Quality Assurance</li>
             </ul>
             <li class="fragment">Software Engineer at EA Tiburon</li>
             <li class="fragment">Modeling and Simulation Engineer at BAE Systems</li>
@@ -64,7 +66,7 @@
         </section>
 
 
-				<!-- Platform Oviewview -->
+				<!-- Platform Overview -->
 				<section title="8thBridge Overview">
           <h2>8thBridge Overview</h2>
 					<ul>
@@ -72,7 +74,7 @@
             <li class="fragment">Social discovery plugins to create an on-site social experience</li>
             <li class="fragment">Analytics workbench to provide product and user insights</li>
             <li class="fragment">Technology used included nginx, python, MongoDB, Celery Queue all running on AWS</li>
-            <li class="fragment">Amazon EMR for hosted hadoop mapreduce functionality</li>
+            <li class="fragment">Amazon EMR for hosted hadoop MapReduce functionality</li>
           </ul>
 				</section>
 
@@ -197,7 +199,7 @@
 				</section>
 
   			<!-- Multi-tenancy -->
-  			<section title="Mutli-tenant data">
+  			<section title="Multi-tenant data">
   				<h2>Multi-tenant data</h2>
   				<ul>
   					<li class="fragment">Data for all clients stored in same collections</li>
@@ -235,7 +237,7 @@
         </section>
 
         <section title="Issues with initial Deployment">
-          <h2>Issues with orignal architecture</h2>
+          <h2>Issues with original architecture</h2>
           <ul>
             <li class="fragment">Even though we had a slave in US-WEST we were really just 1 region</li>
             <li class="fragment">Shard key choices for some collections caused hotspotting</li>
@@ -251,7 +253,7 @@
           <ul>
             <li class="fragment">Scheduling the balancer to rebalance across shards</li>
             <li class="fragment">Implemented a tracking drainer to move tracking documents into S3</li>
-            <li class="fragment">Implemented mapreduce jobs using EMR for reporting and moved away from ETL processes in python</li>
+            <li class="fragment">Implemented MapReduce jobs using EMR for reporting and moved away from ETL processes in python</li>
             <li class="fragment">A lot of query optimizations</li>
             <li class="fragment">Limited indexes on collections due to memory limitations</li>
             <li class="fragment">Removed count operations in code</li>
