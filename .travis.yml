@@ -11,3 +11,6 @@ before_install:
 
 after_success:
     "scp -i id_rsa -r images assets index.html mbjerkness@bjerkness.net:~"
+
+before_script:
+  - echo -e "Host bjerkness.net\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
