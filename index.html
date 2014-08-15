@@ -14,16 +14,16 @@
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<link rel="stylesheet" href="/reveal.js/css/reveal.min.css">
-		<link rel="stylesheet" href="/reveal.js/css/theme/default.css" id="theme">
+		<link rel="stylesheet" href="http://bjerkness.net/reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="http://bjerkness.net/reveal.js/css/theme/default.css" id="theme">
 		<link rel="stylesheet" href="assets/style.css">
 
 		<!-- For syntax highlighting -->
-		<link rel="stylesheet" href="/reveal.js/lib/css/zenburn.css">
+		<link rel="stylesheet" href="http://bjerkness.net/reveal.js/lib/css/zenburn.css">
 
 		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
 		<script>
-			document.write( '<link rel="stylesheet" href="/reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+			document.write( '<link rel="stylesheet" href="http://bjerkness.net/reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
 		</script>
 
 		<!--[if lt IE 9]>
@@ -41,34 +41,28 @@
 					<h2>Lessons Learned From a Large-Scale MongoDB Cluster in the Cloud	</h2>
 				</section>
 
-        <!-- Section on my background and who I am -->
-				<section>
-
-					<section title="Who am I">
-						<h2>Who am I?</h2>
-					</section>
-
-					<section title="Bjerkness Slide">
-						<h2>Mike Bjerkness</h2>
-						<h5>Director of Development</h5>
-						<div><small>mbjerkness@spscommerce.com</small></div>
-						<small><a href="http://twitter.com/mikebjerkness">@mikebjerkness</a></small>
-					</section>
-
-          <section title="Background">
-            <h2>Background</h2>
-            <ul>
-              <li class="fragment">Director of Engineering at 8thBridge</li>
-              <ul>
-                <li class="fragment">Responsible for Software Development</li>
-                <li class="fragment">Resposnible for Operations</li>
-                <li class="fragment">Resposnible for Quality Assurance</li>
-              </ul>
-              <li class="fragment">Software Engineer at EA Tiburon</li>
-              <li class="fragment">Modeling and Simulation Engineer at BAE Systems</li>
-            </ul>
-          </section>
+				<section title="Who am I">
+					<h2>Who am I?</h2>
+					<h4>Mike Bjerkness</h4>
+					<h5>Director of Development</h5>
+					<div><small>mbjerkness@spscommerce.com</small></div>
+					<small><a href="http://twitter.com/mikebjerkness">@mikebjerkness</a></small>
 				</section>
+
+        <section title="Background">
+          <h2>Background</h2>
+          <ul>
+            <li class="fragment">Director of Engineering at 8thBridge</li>
+            <ul>
+              <li class="fragment">Responsible for Software Development</li>
+              <li class="fragment">Resposnible for Operations</li>
+              <li class="fragment">Resposnible for Quality Assurance</li>
+            </ul>
+            <li class="fragment">Software Engineer at EA Tiburon</li>
+            <li class="fragment">Modeling and Simulation Engineer at BAE Systems</li>
+          </ul>
+        </section>
+
 
 				<!-- Platform Oviewview -->
 				<section title="8thBridge Overview">
@@ -83,21 +77,20 @@
 				</section>
 
 				<!-- Object data gathering -->
-				<section>
-					<section title="Gathering Unstructured Object Data">
-						<h2>Gathering Unstructured Data</h2>
-						<h4>object data</h4>
-						<ul>
-							<li class="fragment">The 8thBridge JavaScript host script and plugins are added to a client website</li>
-							<li class="fragment">The first load of the webpage will kick off hydration</li>
-							<li class="fragment">Hydration scrapes the page for data including image, title, description, price, and any other custom data items</li>
-							<li class="fragment">Hydration stores object data in MongoDB with a core set of properties including URL, image, creation date, updated date, version, and a few others. All other object data is stored in an attribute array on the object</li>
-						</ul>
-					</section>
+				<section title="Gathering Unstructured Object Data">
+					<h2>Gathering Unstructured Data</h2>
+					<h4>object data</h4>
+					<ul>
+						<li class="fragment">The 8thBridge JavaScript host script and plugins are added to a client website</li>
+						<li class="fragment">The first load of the webpage will kick off hydration</li>
+						<li class="fragment">Hydration scrapes the page for data including image, title, description, price, and any other custom data items</li>
+						<li class="fragment">Hydration stores object data in MongoDB with a core set of properties including URL, image, creation date, updated date, version, and a few others. All other object data is stored in an attribute array on the object</li>
+					</ul>
+				</section>
 
-					<section title="meta tags">
-						<h2>Meta Tags</h2>
-					<pre><code data-trim>
+				<section title="meta tags">
+					<h2>Meta Tags</h2>
+				<pre><code data-trim>
 <html>
 <head>
 <meta property="og:image" content="http://www.bjerkness.com/assets/images/ninja.jpg">
@@ -114,26 +107,66 @@
 </head>
 </html>
 					</code></pre>
-					</section>
 				</section>
 
-				<!-- Tracking data gathering -->
-				<section>
-					<section title="Gathering Tracking Data">
-						<h2>Gathering Unstructured Data</h2>
-						<h4>tracking data</h4>
-						<ul>
-							<li class="fragment">The 8thBridge platform tracks data a variety of ways</li>
-							<li class="fragment">Plugin tracking, similar to Google Analytics, Omniture, etc</li>
-							<li class="fragment">Clickthrough tracking in API</li>
-							<li class="fragment">Behavior tracking in every plugin</li>
-							<li class="fragment">Adding 10 million tracking records per day</li>
-						</ul>
-					</section>
+        <section title="Object Document">
+          <h2>Example Object Document</h2>
+          <pre><code data-trim>
+{
+  "_id" : ObjectId("4f39683757528d79fa000000"),
+  "faid" : "107447792715498",
+  "aggregate_action_count" : 4,
+  "updated" : ISODate("2014-08-14T20:46:35.511Z"),
+  "created" : ISODate("2014-08-14T20:46:35.511Z"),
+  "url": "http://bjerkness.com/camera.html",
+  "image": "http://bjerkness.com/camera.jpg",
+  "attrs" : [
+    {
+      "prefix" : "og",
+      "name" : "title",
+      "val" : "Sony VAIO VGN-TXN27N/B 11.1"
+    },
+    {
+      "prefix" : "og",
+      "name" : "url",
+      "val" : "http://bjerkness.com/camera.html"
+    },
+    {
+      "prefix" : "og",
+      "name" : "type",
+      "val" : "product"
+    },
+    {
+      "prefix" : "og",
+      "name" : "image",
+      "val" : "http://bjerkness.com/camera.jpg"
+    },
+    {
+      "prefix" : "eb",
+      "name" : "category",
+      "val" : "no category"
+    }
+  ]
+}
+          </code></pre>
+        </section>
 
-					<section title="Plugin View Tracking Document">
-						<h2>Example Tracking Document</h2>
-					<pre><code data-trim>
+				<!-- Tracking data gathering -->
+				<section title="Gathering Tracking Data">
+					<h2>Gathering Unstructured Data</h2>
+					<h4>tracking data</h4>
+					<ul>
+						<li class="fragment">The 8thBridge platform tracks data a variety of ways</li>
+						<li class="fragment">Plugin tracking, similar to Google Analytics, Omniture, etc</li>
+						<li class="fragment">Clickthrough tracking in API</li>
+						<li class="fragment">Behavior tracking in every plugin</li>
+						<li class="fragment">Adding 10 million tracking records per day</li>
+					</ul>
+				</section>
+
+				<section title="Plugin View Tracking Document">
+					<h2>Example Tracking Document</h2>
+		      <pre><code data-trim>
 {
 	"_id" : "B6NSyhauLpHJT+cQ6z8",
 	"faid" : "118407138370644",
@@ -149,33 +182,30 @@
 		"id" : ObjectId("525fcbcdfa489e0f011bc135"),
 	}
 }
-					</code></pre>
-					</section>
+				  </code></pre>
 				</section>
 
 				<!-- Social data gathering -->
-				<section>
-					<section title="Gathering Social Data">
-						<h2>Gathering Unstructured Data</h2>
-						<h4>social data</h4>
-						<ul>
-							<li class="fragment">When a user interacts with an 8thBridge social plugin, Facebook authorization is offered</li>
-							<li class="fragment">After successful authorization, the API will send asynchronous tasks to Celery to gather the user’s Facebook Profile information</li>
-							<li class="fragment">The resulting data is stored in both MongoDB</li>
-						</ul>
-					</section>
-
-
-				<!-- Multi-tenancy -->
-				<section title="Mutli-tenant data">
-					<h2>Multi-tenant data</h2>
+				<section title="Gathering Social Data">
+					<h2>Gathering Unstructured Data</h2>
+					<h4>social data</h4>
 					<ul>
-						<li class="fragment">Data for all clients stored in same collections</li>
-						<li class="fragment">Client-specific identifiers allow us to split the data</li>
-						<li class="fragment">We can bring on new clients very quickly since all databases and collections are created already</li>
-						<li class="fragment">Adding new tracking elements is straightforward</li>
+						<li class="fragment">When a user interacts with an 8thBridge social plugin, Facebook authorization is offered</li>
+						<li class="fragment">After successful authorization, the API will send asynchronous tasks to Celery to gather the user’s Facebook Profile information</li>
+						<li class="fragment">The resulting data is stored in both MongoDB</li>
 					</ul>
 				</section>
+
+  			<!-- Multi-tenancy -->
+  			<section title="Mutli-tenant data">
+  				<h2>Multi-tenant data</h2>
+  				<ul>
+  					<li class="fragment">Data for all clients stored in same collections</li>
+  					<li class="fragment">Client-specific identifiers allows the data to be split</li>
+  					<li class="fragment">New clients can be on-boarded very quickly since all databases and collections are created already</li>
+  					<li class="fragment">Adding new tracking elements is straightforward</li>
+  				</ul>
+  			</section>
 
 
 				<!-- Mongo -->
@@ -187,7 +217,6 @@
 						<li class="fragment">Powerful query language</li>
             <li class="fragment">Easy to add fields to documents in collections</li>
             <li class="fragment">Easy learning curve for development team</li>
-
 					</ul>
 				</section>
 
@@ -221,19 +250,21 @@
           <h2>Work arounds</h2>
           <ul>
             <li class="fragment">Scheduling the balancer to rebalance across shards</li>
-            <li class="fragment">Wrote a tracking drainer to move tracking documents into S3</li>
-            <li class="fragment">Implemented Hadoop using EMR for reporting and moved away from ETL processes in python</li>
+            <li class="fragment">Implemented a tracking drainer to move tracking documents into S3</li>
+            <li class="fragment">Implemented mapreduce jobs using EMR for reporting and moved away from ETL processes in python</li>
             <li class="fragment">A lot of query optimizations</li>
             <li class="fragment">Limited indexes on collections due to memory limitations</li>
             <li class="fragment">Removed count operations in code</li>
+            <li class="fragment">Renamed fields on documents to have shorter names</li>
           </ul>
         </section>
 
         <section title="Epiphany">
           <h2>Major change</h2>
           <ul>
-            <li class="fragment">Operations engineer went to Velocity conference and talked to Etsy peeps</li>
-            <li class="fragment">Move away from 4 shards to a single sharded architecture</li>
+            <li class="fragment">Operations engineer went to Velocity conference and talked to Miles Ward from Amazon</li>
+            <li class="fragment">White paper referenced during their chat: <small>https://media.amazonwebservices.com/AWS_NoSQL_MongoDB.pdf</small></li>
+            <li class="fragment">Moved away from 4 shards to a single sharded architecture</li>
             <li class="fragment">New AWS hi1.4xlarge instance with 60GB RAM and 2x 1 TB SSDs for master and 1 slave</li>
             <li class="fragment">New AWS cc2.8xlarge instance with 60GB RAM and 4x 840 GB drives for the other slave</li>
             <li class="fragment">Saved money, simplified architecture, added extra headroom</li>
@@ -242,8 +273,13 @@
           </ul>
         </section>
 
-        <section title="Rejoice">
-          <h2>Rejoice!</h2>
+      <section title="Success">
+        <h2>Success</h2>
+        <img width="900" height="600" src="images/success_kid.jpg" alt="success">
+      </section>
+
+        <section title="Success">
+          <h2>Success</h2>
           <ul>
             <li class="fragment">20x increase in traffic during the 2013 holiday season</li>
             <li class="fragment">Went from an average of 5,000 API requests per minute to an average ranging from 75,000 - 100,000 RPM peaking at 150,000 RPM</li>
@@ -269,7 +305,6 @@
             <li class="fragment">Our monitoring did not alert us soon enough to remediate the problem before the platform had major performance degradation</li>
           </ul>
         </section>
-
 
         <section title="Remediation">
           <h2>Remediation</h2>
@@ -311,8 +346,8 @@
 						<ul><li class="fragment">improved in 2.4</li>
 						<li class="fragment">still a database-wide read-write lock</li></ul>
 					</ul>
-
 				</section>
+
 				<section title="Sharding">
 					<h2>Sharding</h2>
 					<ul>
@@ -333,8 +368,8 @@
 
 		</div>
 
-		<script src="/reveal.js/lib/js/head.min.js"></script>
-		<script src="/reveal.js/js/reveal.min.js"></script>
+		<script src="http://bjerkness.net/reveal.js/lib/js/head.min.js"></script>
+		<script src="http://bjerkness.net/reveal.js/js/reveal.min.js"></script>
 
 		<script>
 
@@ -355,12 +390,12 @@
 
 				// Optional libraries used to extend on reveal.js
 				dependencies: [
-					{ src: '/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
-					{ src: '/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: '/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: '/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-					{ src: '/reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
-					{ src: '/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					{ src: 'http://bjerkness.net/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'http://bjerkness.net/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'http://bjerkness.net/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'http://bjerkness.net/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'http://bjerkness.net/reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'http://bjerkness.net/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
 				]
 			});
 
@@ -386,7 +421,7 @@
 		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-		  ga('create', 'UA-20880824-15', 'strcst.net');
+		  ga('create', 'UA-20880824-15', 'bjerkness.net');
 		  ga('send', 'pageview');
 
 		</script>
